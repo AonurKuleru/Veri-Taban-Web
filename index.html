@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hastane Yönetim Sistemi v2.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">🏥 Hastane Otomasyonu</div>
+            <button class="nav-btn active" onclick="switchTab('hasta')">👤 Hasta Kayıt</button>
+            <button class="nav-btn" onclick="switchTab('doktor')">🩺 Doktor İşlemleri</button>
+            <button class="nav-btn" onclick="switchTab('bolum')">🏢 Bölüm İşlemleri</button>
+            <button class="nav-btn" onclick="switchTab('randevu')">📅 Randevu Al</button>
+            <div class="status-bar">● Bağlantı Durumu: Hazır</div>
+        </aside>
+
+        <main class="main-content">
+            
+            <section id="hasta-tab" class="tab-content active">
+                <div class="card">
+                    <h3>Hasta Kayıt Kartı</h3>
+                    <form id="hastaForm">
+                        <div class="form-grid">
+                            <div class="form-group"><label>T.C. Kimlik No</label><input type="text" id="tcNo" required maxlength="11"></div>
+                            <div class="form-group"><label>Ad Soyad</label><input type="text" id="adSoyad" required></div>
+                            <div class="form-group"><label>Doğum Tarihi</label><input type="date" id="dogumTarihi" required></div>
+                            <div class="form-group">
+                                <label>Cinsiyet</label>
+                                <select id="cinsiyet" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="Erkek">Erkek</option>
+                                    <option value="Kadın">Kadın</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-blue" onclick="getHastalar()">🔄 Listele</button>
+                            <button type="submit" class="btn btn-green">➕ Yeni Kayıt</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <table id="hastaTablosu">
+                        <thead><tr><th>T.C. Kimlik No</th><th>Ad Soyad</th><th>Doğum Tarihi</th><th>Cinsiyet</th><th>İşlem</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="doktor-tab" class="tab-content">
+                <div class="card">
+                    <h3>Doktor Kayıt Kartı</h3>
+                    <form id="doktorForm">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Ad Soyad</label><input type="text" id="docAdSoyad" required></div>
+                            <div class="form-group"><label>Uzmanlık Alanı</label><input type="text" id="docUzmanlik" required></div>
+                            <div class="form-group"><label>Unvan</label><input type="text" id="docUnvan" placeholder="Örn: Prof. Dr." required></div>
+                            <div class="form-group">
+                                <label>Bağlı Olduğu Bölüm</label>
+                                <select id="docBolumSelect" required><option value="">Bölüm Seçiniz...</option></select>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-blue" onclick="getDoktorlar()">🔄 Listele</button>
+                            <button type="submit" class="btn btn-green">➕ Doktor Ekle</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <table id="doktorTablosu">
+                        <thead><tr><th>Personel ID</th><th>Ad Soyad</th><th>Uzmanlık</th><th>Unvan</th><th>Bölüm</th><th>İşlem</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="bolum-tab" class="tab-content">
+                <div class="card">
+                    <h3>Bölüm Kayıt Kartı</h3>
+                    <form id="bolumForm">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Bölüm Adı</label><input type="text" id="bolumAdi" placeholder="Örn: Kardiyoloji" required></div>
+                            <div class="form-group"><label>Oda Numarası</label><input type="text" id="odaNo" required></div>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-blue" onclick="getBolumler()">🔄 Listele</button>
+                            <button type="submit" class="btn btn-green">➕ Bölüm Ekle</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <table id="bolumTablosu">
+                        <thead><tr><th>Bölüm ID</th><th>Bölüm Adı</th><th>Oda Numarası</th><th>İşlem</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="randevu-tab" class="tab-content">
+                <div class="card">
+                    <h3>Randevu Oluştur</h3>
+                    <form id="randevuForm">
+                        <div class="form-grid">
+                            <div class="form-group"><label>Hasta Seçin</label><select id="randevuHasta" required></select></div>
+                            <div class="form-group"><label>Bölüm Seçin</label><select id="randevuBolum" onchange="filterDoktorByBolum()" required></select></div>
+                            <div class="form-group"><label>Doktor Seçin</label><select id="randevuDoktor" required><option value="">Önce Bölüm Seçin...</option></select></div>
+                            <div class="form-group"><label>Randevu Tarihi</label><input type="datetime-local" id="randevuTarih" required></div>
+                        </div>
+                        <button type="submit" class="btn btn-green" style="margin-top: 15px; width: 100%;">📅 Randevu Oluştur</button>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
